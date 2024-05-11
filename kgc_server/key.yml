@@ -1,0 +1,29 @@
+# swagger.yml
+
+openapi: 3.0.0
+info:
+  title: "RP Flask REST API"
+  description: "An API about people and notes"
+  version: "1.0.0"
+
+servers:
+  - url: "/key"
+
+paths:
+  /pmk:
+    get:
+      operationId: "kgc_initial.get_pmk"
+      tags:
+        - "key"
+      responses:
+        "200":
+          description: "Successfully read pmk"
+  
+  /pumk:
+    get:
+      operationId: "kgc_initial.get_pumk"
+      tags:
+        - "key"
+      responses:
+        "200":
+          description: "Successfully read pumk"
