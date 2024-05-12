@@ -1,11 +1,12 @@
-import sqlite3
-db_path = '/home/kupo/hybrid_zkp_abe/fog_server/enc_data.db'
-conn = sqlite3.connect(db_path)
-columns = [
-    "id INTEGER PRIMARY KEY",
-    "user_id INTEGER UNIQUE",
-    "enc_key VARCHAR",
-    "cipher VARCHAR",
-]
-create_table_cmd = f"CREATE TABLE medicaldata ({','.join(columns)})"
-conn.execute(create_table_cmd)
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base
+
+SQLALCHEMY_DATABASE_URL = "sqlite:///./enc_data.db"
+# SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
+
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+Base = declarative_base()

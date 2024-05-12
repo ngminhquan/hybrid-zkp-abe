@@ -1,17 +1,29 @@
-from config import db, ma
+#Alchemy models
 
-class MData(db.Model):
-    __tablename__ = "medicaldata"
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, unique=True)
-    enc_key = db.Column(db.Text)
-    cipher = db.Column(db.Text)
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
 
-class DataSchema(ma.SQLAlchemyAutoSchema):
-    class Meta:
-        model = MData
-        load_instance = True
-        sqla_session = db.session
+from fog_server.data_db import Base
 
-mdata_schema = DataSchema()
-alldata_schema = DataSchema(many=True)
+
+class Collector(Base):
+    __tablename__ = "collectors"
+
+    id = Column(Integer, primary_key=True)
+    Collector_id = Column(String, unique=True, index=True)
+    Di = Column(String)
+    MAC = Column(String)
+
+    data = relationship("Data", back_populates="owner")
+
+
+class Data(Base):
+    __tablename__ = "medical_data"
+
+    id = Column(Integer, primary_key=True)
+    data_type = Column(String, index=True)
+    enc_key = Column(String, index=True)
+    cipher = Column(String, index=True)
+    owner_id = Column(Integer, ForeignKey("collectors.id"))
+
+    owner = relationship("Collector", back_populates="data")
