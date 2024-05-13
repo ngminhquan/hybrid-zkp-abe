@@ -4,41 +4,37 @@ sys.path.insert(0, '/home/kupo/hybrid_zkp_abe')
 from pydantic import BaseModel
 
 
-class DataBase(BaseModel):
-    data_type: str
-    enc_key: str
-    cipher: str
+class PhysPubBase(BaseModel):
+    att: str
 
 
-class DataCreate(DataBase):
-    proof: str
-
-
-class Data(DataBase):
+class PhysPub(PhysPubBase):
     id: int
-    data_type: str
-    enc_key: str
-    cipher: str
-    owner_id: int
+    att: str
+    key_x: int
+    key_y: int
 
     class Config:
         from_attributes = True
 
 
-class CollectorBase(BaseModel):
-    Collector_id: str
+class PhysicalBase(BaseModel):
+    att: str
+    alpha: int
 
 
-class CollectorCreate(CollectorBase):
-    Di_x: str
-    Di_y: str
+class PhysicalCreate(PhysicalBase):
+    hash_phys: str
+    key_x: int
+    key_y: int
 
 
-class Collector(CollectorBase):
+class Physical(PhysicalBase):
     id: int
-    Di_x: str
-    Di_y: str
-    data: list[Data] = []
+    att: str
+    alpha: int
+    hash_phys: str
+
 
     class Config:
         from_attributes = True

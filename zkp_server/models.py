@@ -20,5 +20,5 @@ class Phys_public(Base):
 
     id = Column(Integer, primary_key=True)
     att = Column(String, ForeignKey("attributes_private.att"))
-    key_x = Column(String, index=True)
-    key_y = Column(String, index=True)
+    key_x = Column(Integer, index=True)
+    key_y = Column(Integer, index=True)
