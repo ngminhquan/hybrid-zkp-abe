@@ -11,8 +11,8 @@ class Collector(Base):
 
     id = Column(Integer, primary_key=True)
     Collector_id = Column(String, unique=True, index=True)
-    Di = Column(String)
-    MAC = Column(String)
+    Di_x = Column(String)
+    Di_y = Column(String)
 
     data = relationship("Data", back_populates="owner")
 

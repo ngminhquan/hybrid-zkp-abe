@@ -25,13 +25,18 @@ class Proof:
         self.encrypted_random = encrypted_random
         self.c = c
         self.z = z
-    
-    def display(self):
-        print("Encrypted random: ")
-        self.encrypted_random.display()
-        print("c = ", self.c)
-        print("z = ", self.z)
 
+def proof2dict(proof: Proof):
+    dict = {}
+    dict['er_x'] = proof.encrypted_random.x
+    dict['er_y'] = proof.encrypted_random.y
+    dict['c'] = proof.c
+    dict['z'] = proof.z
+    return dict
+
+def dict2proof(dict):
+    proof = Proof(field.Point(curve, dict['er_x'], dict['er_y']), dict['c'], dict['z'])
+    return proof
 def zkp_generate(secret_info: int, ID: int):
     # random r and calc r*G
     r = randint(pow(2,254), pow(2,256))
@@ -42,6 +47,7 @@ def zkp_generate(secret_info: int, ID: int):
 
     # challenge c = H(ID,g,g^r, g^x)
     c_bytes = SHA256.new(int_to_bytes(ID) + int_to_bytes(curve.g.x) + int_to_bytes(encrypted_r.x) + int_to_bytes(public_info.x)).digest()
+    #c_bytes = SHA256.new(ID.encode() + int_to_bytes(curve.g.x) + int_to_bytes(encrypted_r.x) + int_to_bytes(public_info.x)).digest()
     c_int = int.from_bytes(c_bytes, byteorder='big')
     z = r + c_int * secret_info
 
@@ -54,28 +60,23 @@ def zkp_verify(proof: Proof, public_info: field.Point, ID: int):
     receive_z = proof.z
     # check if c is calculated correctly
     if receive_c == int.from_bytes(SHA256.new(int_to_bytes(ID) + int_to_bytes(curve.g.x) + int_to_bytes(receive_encrypted_r.x) + int_to_bytes(public_info.x)).digest(), byteorder='big'):
+    #if receive_c == int.from_bytes(SHA256.new(ID.encode() + int_to_bytes(curve.g.x) + int_to_bytes(receive_encrypted_r.x) + int_to_bytes(public_info.x)).digest(), byteorder='big'):
         lhs = receive_z * curve.g
         rhs = receive_encrypted_r + receive_c * public_info
         # verify proof z (z*G =? r*G + c*x*G)
         if lhs == rhs:
-            print("Valid proof")
+            #print("Valid proof")
             return True
-    print("Invalid proof")
+    #print("Invalid proof")
     return False
+
 '''
 real_info = 345
 fake_info = 344
 public_info = real_info * curve.g
 
-start = time.time()
-
-zkproof_real = zkp_generate(real_info,1)
-zkproof_fake = zkp_generate(fake_info,1)
-print(zkp_verify(zkproof_real, public_info,1))
-print(zkp_verify(zkproof_fake, public_info,1))
-
-end = time.time()
-duration = end - start
-
-print("Verify duration: ", duration)
+zkproof_real = zkp_generate(real_info,'1')
+zkproof_fake = zkp_generate(fake_info,'1')
+print(zkp_verify(zkproof_real, public_info,'1'))
+print(zkp_verify(zkproof_fake, public_info,'1'))
 '''
