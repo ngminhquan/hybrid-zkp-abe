@@ -6,29 +6,13 @@ from ecc import field
 from Crypto.Hash import SHA256
 from random import randint
 from Crypto.Cipher import AES
-from Crypto.Util.Padding import pad, unpad
-from Crypto.Random import get_random_bytes
+from cpabe_xcrypt.AES_CBC import int_to_bytes, encrypt_AES, decrypt_AES
 import netifaces
 import requests
+import json
 
-def int_to_bytes(number):
-    byte_length = (number.bit_length() + 7) // 8
-    return number.to_bytes(byte_length, byteorder='big')
-def encrypt_AES(key, plaintext):
-    # Generate a random Initialization Vector (IV)
-    iv = get_random_bytes(AES.block_size)
-    
-    # Create AES cipher object
-    cipher = AES.new(key, AES.MODE_CBC, iv)
-    
-    # Pad the plaintext
-    padded_plaintext = pad(plaintext, AES.block_size)
-    
-    # Encrypt the plaintext
-    ciphertext = cipher.encrypt(padded_plaintext)
-    
-    # Return IV and ciphertext
-    return iv, ciphertext
+
+user_id = '1234'
 #Select an elliptic curve for the ECC-based protocol
 samplecurve = registry.get_curve("brainpoolP256r1")
 p = samplecurve.field.p
@@ -49,3 +33,24 @@ r = randint(2**254, 2**256)
 R = r * curve.g 
 
 k = SHA256.new(int_to_bytes(r*Pzs.x)).digest()
+dict_ai = {'A1':'phyA1', 'A2':'phyA2'}
+#encrypt
+data = json.dumps(dict_ai)
+iv,ciphertext = encrypt_AES(k,data.encode())
+
+# Dữ liệu cần gửi trong POST request
+data = {'user_id': user_id,
+        'R_x': R.x,
+        'iv': iv, 
+        'ct': ciphertext}
+
+#Đường dẫn để thực hiện POST request
+url = f"http://127.0.0.1:9000/registration/"
+
+# Thực hiện POST request và lấy response
+response = requests.post(url, json=data)
+
+# Hiển thị response
+print("Response:", response.json())
+
+

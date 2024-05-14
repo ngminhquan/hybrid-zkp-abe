@@ -6,7 +6,34 @@ import json
 def int_to_bytes(n, byteorder='big'):
     length = (n.bit_length() + 7) // 8
     return n.to_bytes(length, byteorder)
+def encrypt_AES(key, plaintext):
+    # Generate a random Initialization Vector (IV)
+    iv = get_random_bytes(AES.block_size)
+    
+    # Create AES cipher object
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    
+    # Pad the plaintext
+    padded_plaintext = pad(plaintext, AES.block_size)
+    
+    # Encrypt the plaintext
+    ciphertext = cipher.encrypt(padded_plaintext)
+    
+    # Return IV and ciphertext
+    return iv, ciphertext
 
+def decrypt_AES(key, iv, ciphertext):
+    # Create AES cipher object
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    
+    # Decrypt the ciphertext
+    decrypted_plaintext = cipher.decrypt(ciphertext)
+    
+    # Unpad the decrypted plaintext
+    unpadded_plaintext = unpad(decrypted_plaintext, AES.block_size)
+    
+    # Return the plaintext
+    return unpadded_plaintext
 class SymmetricEncryption(object):
     """
     A large number of the schemes can only encrypt group elements
